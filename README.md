@@ -1,4 +1,4 @@
-```md
+
 # 🛒 E-Commerce Backend (Java + Spring Boot)
 
 A scalable and modular e-commerce platform built with **Java 17** and **Spring Boot 3**.  

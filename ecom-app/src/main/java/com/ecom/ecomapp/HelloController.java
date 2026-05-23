@@ -17,4 +17,10 @@ public class HelloController {
         return "this user is, shivam!";
     }
 
+
+    @GetMapping("/jungle")
+    public String jungle() {
+        return "Welcome to the jungle, shivam!";
+    }
+
 }

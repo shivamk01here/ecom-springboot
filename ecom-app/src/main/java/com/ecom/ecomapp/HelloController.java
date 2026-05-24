@@ -1,6 +1,8 @@
 package com.ecom.ecomapp;
 
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -21,6 +23,14 @@ public class HelloController {
     @GetMapping("/jungle")
     public String jungle() {
         return "Welcome to the jungle, shivam!";
+    }
+
+    @PostMapping("/hello")
+    public String createHello(@RequestBody HelloRequest request) {
+        return "Hello, " + request.name() + "!";
+    }
+
+    public static record HelloRequest(String name) {
     }
 
 }

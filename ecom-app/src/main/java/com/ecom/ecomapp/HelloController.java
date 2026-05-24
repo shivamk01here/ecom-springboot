@@ -30,6 +30,11 @@ public class HelloController {
         return "Goodbye, shivam! See you soon.";
     }
 
+    @GetMapping("/status")
+    public String status() {
+        return "Server is up and running.";
+    }
+
     @PostMapping("/hello")
     public String createHello(@RequestBody HelloRequest request) {
         return "Hello, " + request.name() + "!";

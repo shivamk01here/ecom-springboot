@@ -25,6 +25,11 @@ public class HelloController {
         return "Welcome to the jungle, shivam!";
     }
 
+    @GetMapping("/goodbye")
+    public String goodbye() {
+        return "Goodbye, shivam! See you soon.";
+    }
+
     @PostMapping("/hello")
     public String createHello(@RequestBody HelloRequest request) {
         return "Hello, " + request.name() + "!";

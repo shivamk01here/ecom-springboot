@@ -1,64 +1,62 @@
 package com.ecom.ecomapp;
 
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.atomic.AtomicLong;
 
 @Service
 public class ProductService {
 
-    private final Map<Long, Product> products = new ConcurrentHashMap<>();
-    private final AtomicLong nextId = new AtomicLong(1);
+    private final ProductRepository productRepository;
 
-    public ProductService() {
-        createProduct(new ProductRequest("Laptop", "electronics", new BigDecimal("1499.99")));
-        createProduct(new ProductRequest("Running Shoes", "sports", new BigDecimal("89.99")));
+    public ProductService(ProductRepository productRepository) {
+        this.productRepository = productRepository;
     }
 
+    @Transactional
     public Product createProduct(ProductRequest request) {
-        Long id = nextId.getAndIncrement();
-        Product product = new Product(id, request.name(), request.category(), request.price());
-        products.put(id, product);
-        return product;
+        ProductEntity entity = new ProductEntity(request.name(), request.category(), request.price());
+        return convert(productRepository.save(entity));
     }
 
     public List<Product> findAll(String category) {
-        if (category == null || category.isBlank()) {
-            return new ArrayList<>(products.values());
-        }
-        List<Product> result = new ArrayList<>();
-        for (Product product : products.values()) {
-            if (product.category().equalsIgnoreCase(category)) {
-                result.add(product);
-            }
-        }
-        return result;
+        return (category == null || category.isBlank() ?
+                productRepository.findAll() :
+                productRepository.findByCategoryIgnoreCase(category)).stream()
+                .map(this::convert)
+                .toList();
     }
 
     public Product findById(Long id) {
-        Product product = products.get(id);
-        if (product == null) {
-            throw new ProductNotFoundException(id);
-        }
-        return product;
+        return productRepository.findById(id)
+                .map(this::convert)
+                .orElseThrow(() -> new ProductNotFoundException(id));
     }
 
+    @Transactional
     public Product updateProduct(Long id, ProductRequest request) {
-        Product existing = findById(id);
-        Product updated = new Product(existing.id(), request.name(), request.category(), request.price());
-        products.put(id, updated);
-        return updated;
+        ProductEntity existing = productRepository.findById(id)
+                .orElseThrow(() -> new ProductNotFoundException(id));
+        existing.setName(request.name());
+        existing.setCategory(request.category());
+        existing.setPrice(request.price());
+        return convert(productRepository.save(existing));
     }
 
+    @Transactional
     public void deleteProduct(Long id) {
-        if (products.remove(id) == null) {
+        try {
+            productRepository.deleteById(id);
+        } catch (EmptyResultDataAccessException ex) {
             throw new ProductNotFoundException(id);
         }
+    }
+
+    private Product convert(ProductEntity entity) {
+        return new Product(entity.getId(), entity.getName(), entity.getCategory(), entity.getPrice());
     }
 
     public record Product(Long id, String name, String category, BigDecimal price) {

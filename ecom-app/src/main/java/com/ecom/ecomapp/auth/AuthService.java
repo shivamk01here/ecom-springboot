@@ -1,6 +1,7 @@
 package com.ecom.ecomapp.auth;
 
 import com.ecom.ecomapp.config.JwtUtil;
+import com.ecom.ecomapp.config.UserPrincipal;
 import com.ecom.ecomapp.user.Role;
 import com.ecom.ecomapp.user.UserEntity;
 import com.ecom.ecomapp.user.UserRepository;
@@ -51,5 +52,11 @@ public class AuthService {
 
         String token = jwtUtil.generateToken(user.getId(), user.getEmail(), user.getRole().name());
         return new LoginResponse(token, user.getEmail(), user.getName(), user.getRole().name());
+    }
+
+    public UserProfileResponse getProfile(UserPrincipal principal) {
+        UserEntity user = userRepository.findById(principal.id())
+                .orElseThrow(() -> new BadCredentialsException("User not found"));
+        return UserProfileResponse.fromPrincipal(principal, user.getName());
     }
 }

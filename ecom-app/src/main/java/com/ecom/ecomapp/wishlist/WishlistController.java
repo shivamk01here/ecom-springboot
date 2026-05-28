@@ -61,4 +61,18 @@ public class WishlistController {
         wishlistService.clearWishlist(principal.id());
         return ResponseEntity.noContent().build();
     }
+
+    @PostMapping("/transfer-from-cart/{cartItemId}")
+    public ResponseEntity<WishlistItemResponse> transferFromCart(@AuthenticationPrincipal UserPrincipal principal,
+                                                                  @PathVariable Long cartItemId) {
+        WishlistItemResponse response = wishlistService.transferFromCart(principal.id(), cartItemId);
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
+    }
+
+    @PostMapping("/transfer-from-cart-by-product/{productId}")
+    public ResponseEntity<WishlistItemResponse> transferFromCartByProductId(@AuthenticationPrincipal UserPrincipal principal,
+                                                                             @PathVariable Long productId) {
+        WishlistItemResponse response = wishlistService.transferFromCartByProductId(principal.id(), productId);
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
+    }
 }

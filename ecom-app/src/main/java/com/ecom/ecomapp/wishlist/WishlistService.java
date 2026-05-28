@@ -1,5 +1,6 @@
 package com.ecom.ecomapp.wishlist;
 
+import com.ecom.ecomapp.cart.CartItemRepository;
 import com.ecom.ecomapp.product.ProductEntity;
 import com.ecom.ecomapp.product.ProductNotFoundException;
 import com.ecom.ecomapp.product.ProductRepository;
@@ -17,13 +18,16 @@ public class WishlistService {
     private final WishlistItemRepository wishlistItemRepository;
     private final ProductRepository productRepository;
     private final UserRepository userRepository;
+    private final CartItemRepository cartItemRepository;
 
     public WishlistService(WishlistItemRepository wishlistItemRepository,
                            ProductRepository productRepository,
-                           UserRepository userRepository) {
+                           UserRepository userRepository,
+                           CartItemRepository cartItemRepository) {
         this.wishlistItemRepository = wishlistItemRepository;
         this.productRepository = productRepository;
         this.userRepository = userRepository;
+        this.cartItemRepository = cartItemRepository;
     }
 
     public List<WishlistItemResponse> getWishlist(Long userId) {
@@ -76,5 +80,61 @@ public class WishlistService {
 
     public long getWishlistCount(Long userId) {
         return wishlistItemRepository.findByUserId(userId).size();
+    }
+
+    @Transactional
+    public WishlistItemResponse transferFromCart(Long userId, Long cartItemId) {
+        var cartItem = cartItemRepository.findById(cartItemId)
+                .orElseThrow(() -> new RuntimeException("Cart item not found"));
+        
+        if (!cartItem.getUser().getId().equals(userId)) {
+            throw new BadCredentialsException("Not your cart item");
+        }
+
+        ProductEntity product = cartItem.getProduct();
+        
+        // Add product to wishlist
+        var existing = wishlistItemRepository.findByUserIdAndProductId(userId, product.getId());
+        WishlistItemEntity wishlistItem;
+        
+        if (existing.isPresent()) {
+            wishlistItem = existing.get();
+        } else {
+            UserEntity user = userRepository.findById(userId)
+                    .orElseThrow(() -> new BadCredentialsException("User not found"));
+            wishlistItem = new WishlistItemEntity(user, product);
+            wishlistItem = wishlistItemRepository.save(wishlistItem);
+        }
+        
+        // Remove from cart
+        cartItemRepository.delete(cartItem);
+        
+        return new WishlistItemResponse(wishlistItem);
+    }
+
+    @Transactional
+    public WishlistItemResponse transferFromCartByProductId(Long userId, Long productId) {
+        var cartItem = cartItemRepository.findByUserIdAndProductId(userId, productId)
+                .orElseThrow(() -> new RuntimeException("Product not found in cart"));
+        
+        ProductEntity product = cartItem.getProduct();
+        
+        // Add product to wishlist
+        var existing = wishlistItemRepository.findByUserIdAndProductId(userId, productId);
+        WishlistItemEntity wishlistItem;
+        
+        if (existing.isPresent()) {
+            wishlistItem = existing.get();
+        } else {
+            UserEntity user = userRepository.findById(userId)
+                    .orElseThrow(() -> new BadCredentialsException("User not found"));
+            wishlistItem = new WishlistItemEntity(user, product);
+            wishlistItem = wishlistItemRepository.save(wishlistItem);
+        }
+        
+        // Remove from cart
+        cartItemRepository.delete(cartItem);
+        
+        return new WishlistItemResponse(wishlistItem);
     }
 }

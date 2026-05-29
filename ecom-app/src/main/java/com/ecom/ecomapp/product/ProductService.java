@@ -43,4 +43,24 @@ public class ProductService {
                 .orElseThrow(() -> new ProductNotFoundException(id));
         productRepository.delete(product);
     }
+
+    public ProductResponse update(Long id, ProductRequest request) {
+        ProductEntity product = productRepository.findById(id)
+                .orElseThrow(() -> new ProductNotFoundException(id));
+        product.setName(request.getName());
+        product.setDescription(request.getDescription());
+        product.setPrice(request.getPrice());
+        product.setImageUrl(request.getImageUrl());
+        product.setCategory(request.getCategory());
+        product.setStock(request.getStock());
+        ProductEntity updated = productRepository.save(product);
+        return new ProductResponse(updated);
+    }
+
+    public List<ProductResponse> search(String query) {
+        return productRepository.findByNameContainingIgnoreCaseOrDescriptionContainingIgnoreCase(query, query)
+                .stream()
+                .map(ProductResponse::new)
+                .toList();
+    }
 }

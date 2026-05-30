@@ -59,4 +59,12 @@ public class AuthService {
                 .orElseThrow(() -> new BadCredentialsException("User not found"));
         return UserProfileResponse.fromPrincipal(principal, user.getName());
     }
+
+    public UserProfileResponse updateProfile(Long userId, UpdateProfileRequest request) {
+        UserEntity user = userRepository.findById(userId)
+                .orElseThrow(() -> new BadCredentialsException("User not found"));
+        user.setName(request.getName());
+        UserEntity updated = userRepository.save(user);
+        return new UserProfileResponse(updated.getId(), updated.getEmail(), updated.getName(), updated.getRole().name());
+    }
 }

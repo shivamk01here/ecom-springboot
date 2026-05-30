@@ -79,6 +79,20 @@ Or with Gradle:
 
 ---
 
+## 🔌 API Endpoints (Authentication & Profile)
+
+Here are the REST API endpoints implemented for authentication and profile management:
+
+| Method | Endpoint | Description | Request Body / Params |
+| :--- | :--- | :--- | :--- |
+| **POST** | `/api/auth/register` | Register a new user | `RegisterRequest` JSON |
+| **POST** | `/api/auth/login` | Log in and receive a JWT token | `LoginRequest` JSON |
+| **GET** | `/api/auth/me` | Get profile details of the authenticated user | None |
+| **PUT** | `/api/auth/profile` | Update profile name of the authenticated user | `UpdateProfileRequest` JSON |
+| **PUT** | `/api/auth/change-password` | Change password of the authenticated user | `ChangePasswordRequest` JSON |
+
+---
+
 ## 🔌 API Endpoints (Product Catalog)
 
 Here are the REST API endpoints implemented for the product catalog:

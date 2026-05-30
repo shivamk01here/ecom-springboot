@@ -94,6 +94,21 @@ Here are the REST API endpoints implemented for the product catalog:
 
 ---
 
+## 🔌 API Endpoints (Order & Checkout)
+
+Here are the REST API endpoints implemented for the order and checkout catalog:
+
+| Method | Endpoint | Description | Request Body / Params |
+| :--- | :--- | :--- | :--- |
+| **POST** | `/api/orders/checkout` | Checkout current shopping cart to place an order | `CheckoutRequest` JSON |
+| **GET** | `/api/orders` | Retrieve order history for logged-in user | None |
+| **GET** | `/api/orders/{orderId}` | Retrieve a specific order by ID | None |
+| **GET** | `/api/orders/paginated` | Retrieve paginated order history | `?page={page}&size={size}` |
+| **GET** | `/api/orders/status/{status}` | Retrieve paginated orders filtered by status | `?page={page}&size={size}` |
+| **GET** | `/api/orders/statistics` | Retrieve order metrics for current user | None |
+
+---
+
 ## 📖 Notes
 
 This repository is not just about coding features — it's about demonstrating:

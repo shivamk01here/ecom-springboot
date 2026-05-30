@@ -6,16 +6,34 @@ import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.ecom.ecomapp.cart.CartItemEntity;
+import com.ecom.ecomapp.cart.CartItemRepository;
+import com.ecom.ecomapp.product.ProductEntity;
+import com.ecom.ecomapp.product.ProductRepository;
+import com.ecom.ecomapp.user.UserEntity;
+import com.ecom.ecomapp.user.UserRepository;
+
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
 public class OrderService {
 
     private final OrderRepository orderRepository;
+    private final UserRepository userRepository;
+    private final CartItemRepository cartItemRepository;
+    private final ProductRepository productRepository;
 
-    public OrderService(OrderRepository orderRepository) {
+    public OrderService(OrderRepository orderRepository,
+                        UserRepository userRepository,
+                        CartItemRepository cartItemRepository,
+                        ProductRepository productRepository) {
         this.orderRepository = orderRepository;
+        this.userRepository = userRepository;
+        this.cartItemRepository = cartItemRepository;
+        this.productRepository = productRepository;
     }
 
     @Transactional(readOnly = true)

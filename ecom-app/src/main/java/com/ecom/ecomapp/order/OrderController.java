@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("/api/orders")
@@ -75,5 +76,11 @@ public class OrderController {
     @GetMapping("/statistics")
     public ResponseEntity<OrderStatisticsResponse> getOrderStatistics(@AuthenticationPrincipal UserPrincipal principal) {
         return ResponseEntity.ok(orderService.getOrderStatistics(principal.id()));
+    }
+
+    @PostMapping("/checkout")
+    public ResponseEntity<OrderResponse> checkout(@AuthenticationPrincipal UserPrincipal principal,
+                                                   @Valid @RequestBody CheckoutRequest request) {
+        return ResponseEntity.ok(orderService.checkout(principal.id(), request));
     }
 }

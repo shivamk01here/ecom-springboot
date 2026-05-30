@@ -67,4 +67,14 @@ public class AuthService {
         UserEntity updated = userRepository.save(user);
         return new UserProfileResponse(updated.getId(), updated.getEmail(), updated.getName(), updated.getRole().name());
     }
+
+    public void changePassword(Long userId, ChangePasswordRequest request) {
+        UserEntity user = userRepository.findById(userId)
+                .orElseThrow(() -> new BadCredentialsException("User not found"));
+        if (!passwordEncoder.matches(request.getCurrentPassword(), user.getPassword())) {
+            throw new BadCredentialsException("Incorrect current password");
+        }
+        user.setPassword(passwordEncoder.encode(request.getNewPassword()));
+        userRepository.save(user);
+    }
 }

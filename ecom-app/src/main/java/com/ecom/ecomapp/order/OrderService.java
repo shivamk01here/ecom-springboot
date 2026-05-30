@@ -98,4 +98,51 @@ public class OrderService {
 
         return new OrderStatisticsResponse(totalOrders, completedOrders, pendingOrders, cancelledOrders);
     }
+
+    @Transactional
+    public OrderResponse checkout(Long userId, CheckoutRequest request) {
+        UserEntity user = userRepository.findById(userId)
+                .orElseThrow(() -> new BadCredentialsException("User not found"));
+
+        List<CartItemEntity> cartItems = cartItemRepository.findByUserId(userId);
+        if (cartItems.isEmpty()) {
+            throw new RuntimeException("Cannot checkout an empty cart");
+        }
+
+        BigDecimal totalAmount = BigDecimal.ZERO;
+        OrderEntity order = new OrderEntity(user, totalAmount);
+        order.setShippingAddress(request.getShippingAddress());
+        order.setBillingAddress(request.getBillingAddress());
+        order.setPhoneNumber(request.getPhoneNumber());
+        order.setNotes(request.getNotes());
+
+        List<OrderItemEntity> orderItems = new ArrayList<>();
+        for (CartItemEntity cartItem : cartItems) {
+            ProductEntity product = cartItem.getProduct();
+            if (product.getStock() < cartItem.getQuantity()) {
+                throw new RuntimeException("Insufficient stock for product: " + product.getName());
+            }
+
+            product.setStock(product.getStock() - cartItem.getQuantity());
+            productRepository.save(product);
+
+            OrderItemEntity orderItem = new OrderItemEntity(
+                    order,
+                    product,
+                    cartItem.getQuantity(),
+                    product.getPrice()
+            );
+            orderItems.add(orderItem);
+            totalAmount = totalAmount.add(orderItem.getSubtotal());
+        }
+
+        order.setItems(orderItems);
+        order.setTotalAmount(totalAmount);
+
+        OrderEntity savedOrder = orderRepository.save(order);
+
+        cartItemRepository.deleteByUserId(userId);
+
+        return new OrderResponse(savedOrder);
+    }
 }

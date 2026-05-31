@@ -11,6 +11,8 @@ public class ProductResponse {
     private String imageUrl;
     private String category;
     private int stock;
+    private Double averageRating;
+    private Integer reviewCount;
 
     public ProductResponse(ProductEntity entity) {
         this.id = entity.getId();
@@ -22,6 +24,12 @@ public class ProductResponse {
         this.stock = entity.getStock();
     }
 
+    public ProductResponse(ProductEntity entity, Double averageRating, Integer reviewCount) {
+        this(entity);
+        this.averageRating = averageRating;
+        this.reviewCount = reviewCount;
+    }
+
     public Long getId() { return id; }
     public String getName() { return name; }
     public String getDescription() { return description; }
@@ -29,4 +37,8 @@ public class ProductResponse {
     public String getImageUrl() { return imageUrl; }
     public String getCategory() { return category; }
     public int getStock() { return stock; }
+    public Double getAverageRating() { return averageRating; }
+    public void setAverageRating(Double averageRating) { this.averageRating = averageRating; }
+    public Integer getReviewCount() { return reviewCount; }
+    public void setReviewCount(Integer reviewCount) { this.reviewCount = reviewCount; }
 }

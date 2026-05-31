@@ -108,6 +108,18 @@ Here are the REST API endpoints implemented for the product catalog:
 
 ---
 
+## 🔌 API Endpoints (Product Reviews & Ratings)
+
+Here are the REST API endpoints implemented for product reviews and ratings:
+
+| Method | Endpoint | Description | Request Body / Params |
+| :--- | :--- | :--- | :--- |
+| **GET** | `/api/reviews/product/{productId}` | Retrieve all reviews for a specific product (PermitAll) | None |
+| **POST** | `/api/reviews/product/{productId}` | Create or update a review for a product | `ReviewRequest` JSON |
+| **DELETE** | `/api/reviews/{reviewId}` | Delete review by ID (Ownership validated) | None |
+
+---
+
 ## 🔌 API Endpoints (Order & Checkout)
 
 Here are the REST API endpoints implemented for the order and checkout catalog:

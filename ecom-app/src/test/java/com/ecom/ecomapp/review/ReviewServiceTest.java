@@ -42,7 +42,7 @@ public class ReviewServiceTest {
 
     @BeforeEach
     void setUp() {
-        user = new UserEntity("shivam@example.com", "password", "Shivam", Role.CUSTOMER);
+        user = new UserEntity("shivam@example.com", "password", "Shivam", Role.USER);
         user.setId(1L);
 
         product = new ProductEntity("MacBook", "Apple Laptop", new BigDecimal("1299.99"), "image.jpg", "Electronics", 10);

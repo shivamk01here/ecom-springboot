@@ -135,6 +135,16 @@ Here are the REST API endpoints implemented for the order and checkout catalog:
 
 ---
 
+## 🔌 API Endpoints (Coupons & Discounts)
+
+Here are the REST API endpoints implemented for discount coupons:
+
+| Method | Endpoint | Description | Request Body / Params |
+| :--- | :--- | :--- | :--- |
+| **GET** | `/api/coupons/validate` | Validate coupon code and retrieve discount details | `?code={couponCode}` |
+
+---
+
 ## 📖 Notes
 
 This repository is not just about coding features — it's about demonstrating:

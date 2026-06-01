@@ -15,6 +15,8 @@ public class OrderResponse {
     private String phoneNumber;
     private String notes;
     private List<OrderItemResponse> items;
+    private String couponCode;
+    private BigDecimal discountAmount;
 
     public OrderResponse(OrderEntity entity) {
         this.id = entity.getId();
@@ -28,6 +30,8 @@ public class OrderResponse {
         this.items = entity.getItems().stream()
                 .map(OrderItemResponse::new)
                 .collect(Collectors.toList());
+        this.couponCode = entity.getCouponCode();
+        this.discountAmount = entity.getDiscountAmount();
     }
 
     public Long getId() { return id; }
@@ -39,4 +43,6 @@ public class OrderResponse {
     public String getPhoneNumber() { return phoneNumber; }
     public String getNotes() { return notes; }
     public List<OrderItemResponse> getItems() { return items; }
+    public String getCouponCode() { return couponCode; }
+    public BigDecimal getDiscountAmount() { return discountAmount; }
 }

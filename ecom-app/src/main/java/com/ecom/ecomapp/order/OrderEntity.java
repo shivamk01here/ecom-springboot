@@ -44,6 +44,12 @@ public class OrderEntity {
     @Column(length = 255)
     private String notes;
 
+    @Column(length = 50)
+    private String couponCode;
+
+    @Column(precision = 10, scale = 2)
+    private BigDecimal discountAmount;
+
     public OrderEntity() {}
 
     public OrderEntity(UserEntity user, BigDecimal totalAmount) {
@@ -86,4 +92,10 @@ public class OrderEntity {
 
     public String getNotes() { return notes; }
     public void setNotes(String notes) { this.notes = notes; }
+
+    public String getCouponCode() { return couponCode; }
+    public void setCouponCode(String couponCode) { this.couponCode = couponCode; }
+
+    public BigDecimal getDiscountAmount() { return discountAmount; }
+    public void setDiscountAmount(BigDecimal discountAmount) { this.discountAmount = discountAmount; }
 }

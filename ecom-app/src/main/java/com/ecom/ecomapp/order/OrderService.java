@@ -12,6 +12,7 @@ import com.ecom.ecomapp.product.ProductEntity;
 import com.ecom.ecomapp.product.ProductRepository;
 import com.ecom.ecomapp.user.UserEntity;
 import com.ecom.ecomapp.user.UserRepository;
+import com.ecom.ecomapp.coupon.CouponService;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -25,15 +26,18 @@ public class OrderService {
     private final UserRepository userRepository;
     private final CartItemRepository cartItemRepository;
     private final ProductRepository productRepository;
+    private final CouponService couponService;
 
     public OrderService(OrderRepository orderRepository,
-                        UserRepository userRepository,
-                        CartItemRepository cartItemRepository,
-                        ProductRepository productRepository) {
+                         UserRepository userRepository,
+                         CartItemRepository cartItemRepository,
+                         ProductRepository productRepository,
+                         CouponService couponService) {
         this.orderRepository = orderRepository;
         this.userRepository = userRepository;
         this.cartItemRepository = cartItemRepository;
         this.productRepository = productRepository;
+        this.couponService = couponService;
     }
 
     @Transactional(readOnly = true)
@@ -109,8 +113,8 @@ public class OrderService {
             throw new RuntimeException("Cannot checkout an empty cart");
         }
 
-        BigDecimal totalAmount = BigDecimal.ZERO;
-        OrderEntity order = new OrderEntity(user, totalAmount);
+        BigDecimal totalAmountBeforeDiscount = BigDecimal.ZERO;
+        OrderEntity order = new OrderEntity(user, BigDecimal.ZERO);
         order.setShippingAddress(request.getShippingAddress());
         order.setBillingAddress(request.getBillingAddress());
         order.setPhoneNumber(request.getPhoneNumber());
@@ -133,11 +137,33 @@ public class OrderService {
                     product.getPrice()
             );
             orderItems.add(orderItem);
-            totalAmount = totalAmount.add(orderItem.getSubtotal());
+            totalAmountBeforeDiscount = totalAmountBeforeDiscount.add(orderItem.getSubtotal());
+        }
+
+        BigDecimal discountAmount = BigDecimal.ZERO;
+        if (request.getCouponCode() != null && !request.getCouponCode().trim().isEmpty()) {
+            var couponVal = couponService.validateCoupon(request.getCouponCode());
+            if (!couponVal.isValid()) {
+                throw new RuntimeException("Invalid coupon: " + couponVal.getMessage());
+            }
+            BigDecimal percent = couponVal.getDiscountPercent();
+            discountAmount = totalAmountBeforeDiscount
+                    .multiply(percent)
+                    .divide(BigDecimal.valueOf(100), 2, java.math.RoundingMode.HALF_UP);
+            
+            order.setCouponCode(couponVal.getCode());
+            order.setDiscountAmount(discountAmount);
+        } else {
+            order.setDiscountAmount(BigDecimal.ZERO);
+        }
+
+        BigDecimal finalTotalAmount = totalAmountBeforeDiscount.subtract(discountAmount);
+        if (finalTotalAmount.compareTo(BigDecimal.ZERO) < 0) {
+            finalTotalAmount = BigDecimal.ZERO;
         }
 
         order.setItems(orderItems);
-        order.setTotalAmount(totalAmount);
+        order.setTotalAmount(finalTotalAmount);
 
         OrderEntity savedOrder = orderRepository.save(order);
 

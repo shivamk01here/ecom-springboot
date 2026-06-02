@@ -1,5 +1,6 @@
 package com.ecom.ecomapp.order;
 
+import com.ecom.ecomapp.analytics.CategorySalesResponse;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -31,4 +32,11 @@ public interface OrderRepository extends JpaRepository<OrderEntity, Long> {
     long countByUserId(Long userId);
 
     Optional<OrderEntity> findByIdAndUserId(Long id, Long userId);
+
+    @Query("SELECT new com.ecom.ecomapp.analytics.CategorySalesResponse(p.category, SUM(oi.quantity), SUM(oi.subtotal)) " +
+           "FROM OrderItemEntity oi JOIN oi.product p GROUP BY p.category")
+    List<CategorySalesResponse> findCategorySales();
+
+    @Query("SELECT o FROM OrderEntity o ORDER BY o.orderDate DESC")
+    List<OrderEntity> findRecentOrders(Pageable pageable);
 }

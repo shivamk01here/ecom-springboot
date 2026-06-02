@@ -145,6 +145,16 @@ Here are the REST API endpoints implemented for discount coupons:
 
 ---
 
+## 🔌 API Endpoints (Admin Analytics Dashboard)
+
+Here are the REST API endpoints implemented for administrative statistics and business analytics:
+
+| Method | Endpoint | Description | Request Body / Params |
+| :--- | :--- | :--- | :--- |
+| **GET** | `/api/admin/dashboard/statistics` | Retrieve dynamic analytics: total revenue, order count, user count, category sales, recent orders (ADMIN strictly) | None |
+
+---
+
 ## 📖 Notes
 
 This repository is not just about coding features — it's about demonstrating:
